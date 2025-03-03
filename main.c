@@ -47,7 +47,8 @@ void main()
 
     printf("%s %d\n",__FUNCTION__, 1234);
     DPRINT("Hello world 0x%04X !!\n", 0xBEEF);
-    DPRINT("int(%d) float(%f)\n", 0xBEEF, (float)3.14159265);
+    float pi = 3.14159265;
+    DPRINT("int(%d) float(%f)\n", 0xBEEF, pi);
 
     // Setup and perform PDI Test
     ESC_setupPDITestInterface();
