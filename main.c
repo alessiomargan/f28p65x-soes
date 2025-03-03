@@ -1,15 +1,11 @@
 //
 // Included Files
 //
-#include <stdint.h>
-#include <stdio.h>
-#include <file.h>
 
 #include "ethercat_subdevice_cpu1_hal.h"
 #include <soes/ecat_slv.h>
 #include <pins.h>
-#include <sci_io_driverlib.h>
-#include <ti_ascii.h>
+#include <peripherals.h>
 
 extern esc_cfg_t config;
 //
@@ -18,9 +14,6 @@ extern esc_cfg_t config;
 void main()
 {
     uint16_t initStatus;
-    volatile FILE *fid;
-    volatile int status = 0;
-
 
     // Initialize CPU1 and HAL interface
     initStatus = ESC_initHW();
@@ -37,18 +30,6 @@ void main()
     //
     gpio_conf();
     scia_init();
-    // Redirect STDOUT to SCI
-    status = add_device("scia", _SSA, SCI_open, SCI_close, SCI_read, SCI_write,
-                        SCI_lseek, SCI_unlink, SCI_rename);
-    fid = fopen("scia","w");
-    freopen("scia:", "w", stdout);
-    setvbuf(stdout, NULL, _IONBF, 0);
-    print_ascii_banner();
-
-    printf("%s %d\n",__FUNCTION__, 1234);
-    DPRINT("Hello world 0x%04X !!\n", 0xBEEF);
-    float pi = 3.14159265;
-    DPRINT("int(%d) float(%f)\n", 0xBEEF, pi);
 
     // Setup and perform PDI Test
     ESC_setupPDITestInterface();
