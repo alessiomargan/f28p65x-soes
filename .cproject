@@ -162,6 +162,7 @@
 									<listOptionValue builtIn="false" value="${COM_TI_C2000WARE_SYMBOLS}"/>
 									<listOptionValue builtIn="false" value="F28P65X"/>
 									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="ESC_DEBUG"/>
 									<listOptionValue builtIn="false" value="_FLASH"/>
 									<listOptionValue builtIn="false" value="CPU1"/>
 									<listOptionValue builtIn="false" value="PDI_HAL_TEST"/>
@@ -209,7 +210,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="28p65x_generic_ram_lnk_cpu1.cmd|device/driverlib" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="soes/esc_eoe.c|soes/esc_eep.c|soes/esc_foe.c|28p65x_generic_ram_lnk_cpu1.cmd|device/driverlib" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
