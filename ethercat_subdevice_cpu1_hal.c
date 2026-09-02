@@ -1,12 +1,12 @@
-        //###########################################################################
+//###########################################################################
 //
 // FILE:   ethercat_subdevice_cpu1_hal.c
 //
 // TITLE:  C28.CPU1 EtherCAT HAL Driver.
 //
 //###########################################################################
-// $TI Release: F28P65x EtherCAT Software v1.01.00.00 $
-// $Release Date: Tue Oct 29 00:56:43 IST 2024 $
+// $TI Release: F28P65x EtherCAT Software v1.03.00.00 $
+// $Release Date: Wed May 20 00:30:45 IST 2026 $
 // $Copyright:
 // Copyright (C) 2021 Texas Instruments Incorporated - http://www.ti.com/
 //

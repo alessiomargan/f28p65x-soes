@@ -71,9 +71,9 @@
 			<locationURI>GIT_SOES/soes/esc_foe.c</locationURI>
 		</link>
 		<link>
-			<name>soes/esc_hw_tiESC.c</name>
+			<name>soes/esc_hw_f28p65x.c</name>
 			<type>1</type>
-			<locationURI>GIT_SOES/soes/hal/advr_esc/esc_hw_tiESC.c</locationURI>
+			<locationURI>GIT_SOES/soes/hal/advr_esc/esc_hw_f28p65x.c</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
