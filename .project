@@ -94,6 +94,14 @@
 			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/communications/Ethercat/f28p65x/examples/f28p65x_cpu1_pdi_hal_test_app</value>
 		</variable>
 		<variable>
+			<name>FASTRTS_MATH_LIB_ROOT</name>
+			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/math/FPUfastRTS/c28/lib</value>
+		</variable>
+		<variable>
+			<name>FPU_DSP_LIB_ROOT</name>
+			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/dsp/FPU/c28/lib</value>
+		</variable>
+		<variable>
 			<name>GIT_SOES</name>
 			<value>file:/home/amargan/work/code/firmware/SOES</value>
 		</variable>

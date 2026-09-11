@@ -1569,6 +1569,8 @@ ESC_applicationSync0Handler(void)
 #endif  // DC_SUPPORTED
 #endif  // ETHERCAT_STACK
 
+    Sync0_Isr();
+
     //
     // Acknowledge and clear interrupt in ESCSS
     //

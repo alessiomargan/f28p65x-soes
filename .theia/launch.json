@@ -21,7 +21,12 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "launchSettings": {
+                "coresToLoadForProjectLaunch": [
+                    "C28xx_CPU1"
+                ]
+            }
         }
     ]
 }

@@ -50,6 +50,7 @@
                                 <option id="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.LIBRARY.1255009149" superClass="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.LIBRARY" valueType="libs">
                                     <listOptionValue value="libc.a"/>
                                 </option>
+                                <option id="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.OUTPUT_FILE.1480575373" superClass="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.OUTPUT_FILE" value="${ProjName}.out" valueType="string"/>
                             </tool>
                             <tool id="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.objcopy.190652159" name="C2000 Objcopy Utility" superClass="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.objcopy"/>
                         </toolChain>
@@ -65,11 +66,13 @@
             <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.ti.ccstudio.buildDefinitions.C2000.Default.799905247" moduleId="org.eclipse.cdt.core.settings" name="FLASH">
                 <macros>
                     <stringMacro name="ETHERCAT_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/communications/Ethercat/f28p65x"/>
+                    <stringMacro name="FASTRTS_MATH_LIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/math/FPUfastRTS/c28/lib"/>
                     <stringMacro name="C2000WARE_DLIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/driverlib"/>
                     <stringMacro name="GIT_SOES" type="VALUE_PATH_ANY" value="/home/amargan/work/code/firmware/SOES"/>
-                    <stringMacro name="GIT_UC_TEST" type="VALUE_PATH_ANY" value="/home/amargan/work/code/firmware/uc_test"/>
                     <stringMacro name="EXAMPLE_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/communications/Ethercat/f28p65x/examples/f28p65x_cpu1_pdi_hal_test_app"/>
                     <stringMacro name="C2000WARE_DEVICE_SUPPORT_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/device_support"/>
+                    <stringMacro name="FPU_DSP_LIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/dsp/FPU/c28/lib"/>
+                    <stringMacro name="GIT_UC_TEST" type="VALUE_PATH_ANY" value="/home/amargan/work/code/firmware/uc_test"/>
                 </macros>
                 <externalSettings/>
                 <extensions>
