@@ -70,7 +70,7 @@ SECTIONS
    .bss:output      : > RAMLS3
    .init_array      : > FLASH_BANK0, ALIGN(8)
    .const           : > FLASH_BANK0, ALIGN(8)
-   .data            : > RAMLS5
+   .data            : > RAMLS6
    .sysmem          : > RAMLS4
 #else
    .pinit           : > FLASH_BANK0, ALIGN(8)

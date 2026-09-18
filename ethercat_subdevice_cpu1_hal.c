@@ -842,8 +842,8 @@ ESC_signalPass(void)
     //
     // Turn on controlCARD LEDs
     //
-    GPIO_writePin(CCARD_LED_1_GPIO, 0UL);
-    GPIO_writePin(CCARD_LED_2_GPIO, 0UL);
+    GPIO_writePin(DEVICE_GPIO_PIN_LED1, 0UL);
+    GPIO_writePin(DEVICE_GPIO_PIN_LED2, 0UL);
 }
 
 //*****************************************************************************
@@ -857,8 +857,8 @@ ESC_signalFail(void)
     //
     // Toggle controlCARD LEDs and delay
     //
-    GPIO_togglePin(CCARD_LED_1_GPIO);
-    GPIO_togglePin(CCARD_LED_2_GPIO);
+    GPIO_togglePin(DEVICE_GPIO_PIN_LED1);
+    GPIO_togglePin(DEVICE_GPIO_PIN_LED2);
 
     DEVICE_DELAY_US((uint32_t)(500000));
 }
@@ -874,14 +874,14 @@ ESC_passFailSignalSetup(void)
     //
     // Set LED GPIOs to output mode
     //
-    GPIO_setDirectionMode(CCARD_LED_1_GPIO, GPIO_DIR_MODE_OUT);
-    GPIO_setDirectionMode(CCARD_LED_2_GPIO, GPIO_DIR_MODE_OUT);
+    GPIO_setDirectionMode(DEVICE_GPIO_PIN_LED1, GPIO_DIR_MODE_OUT);
+    GPIO_setDirectionMode(DEVICE_GPIO_PIN_LED2, GPIO_DIR_MODE_OUT);
 
     //
     // Turn off controlCARD LEDs
     //
-    GPIO_writePin(CCARD_LED_1_GPIO, 1UL);
-    GPIO_writePin(CCARD_LED_2_GPIO, 1UL);
+    GPIO_writePin(DEVICE_GPIO_PIN_LED1, 1UL);
+    GPIO_writePin(DEVICE_GPIO_PIN_LED2, 1UL);
 }
 #endif // PDI_HAL_TEST
 

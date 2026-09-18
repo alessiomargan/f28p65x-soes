@@ -7,8 +7,11 @@
 
 #include <soes/ecat_slv.h>
 #include <pins.h>
+#include <sci_io_driverlib.h>
 
 extern esc_cfg_t config;
+
+#define DC_SYNC_LED_TOGGLE_TICKS    125U
 
 
 void Sync0_Isr(void) {
@@ -21,11 +24,29 @@ void Sync0_Isr(void) {
 
 __interrupt
 void INT_myCPUTIMER2_ISR(void) {
+    static uint16_t dcSyncLedTicks = 0U;
+    uint8_t syncActivation;
 
     GPIO_writePin(dbg_1, 1);
-    if ( ! ESC_SYNCactivation() ) {
+
+    syncActivation = ESC_SYNCactivation();
+    if (syncActivation == 0U) {
 		ecat_slv();
 	}
+
+    if ((syncActivation & (ESCREG_SYNC_ACT_ACTIVATED |
+                           ESCREG_SYNC_AUTO_ACTIVATED)) != 0U) {
+        dcSyncLedTicks++;
+        if (dcSyncLedTicks >= DC_SYNC_LED_TOGGLE_TICKS) {
+            dcSyncLedTicks = 0U;
+            GPIO_togglePin(DEVICE_GPIO_PIN_LED2);
+        }
+    }
+    else {
+        dcSyncLedTicks = 0U;
+        GPIO_writePin(DEVICE_GPIO_PIN_LED2, 1U);
+    }
+
     GPIO_writePin(dbg_1, 0);
 }
 
@@ -68,7 +89,8 @@ void main()
     {
         //ESC_debugUpdateESCRegLogs();
         DEVICE_DELAY_US((uint32_t)(500000));
-        GPIO_togglePin(DEVICE_GPIO_PIN_LED2);
+        GPIO_togglePin(DEVICE_GPIO_PIN_LED1);
+        
     }
 }
 
