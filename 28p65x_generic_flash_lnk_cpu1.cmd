@@ -108,6 +108,7 @@ SECTIONS
                         ALIGN(8)
    #endif
 
+   .params       : {} > FLASH_BANK2,     palign(8), TYPE=NOLOAD
 }
 
 /*

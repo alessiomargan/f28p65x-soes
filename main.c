@@ -13,7 +13,7 @@ extern esc_cfg_t config;
 
 #define DC_SYNC_LED_TOGGLE_TICKS    125U
 
-
+__attribute__((section(".TI.ramfunc")))
 void Sync0_Isr(void) {
 
     GPIO_writePin(dbg_2, 1);
