@@ -1,0 +1,6 @@
+[submodule "external/SOES"]
+	path = external/SOES
+	url = https://github.com/alessiomargan/SOES.git
+[submodule "external/uc-test"]
+	path = external/uc-test
+	url = https://github.com/alessiomargan/uc-test.git
