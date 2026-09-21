@@ -1,8 +1,0 @@
-# This is an auto-generated file - do not add it to source-control
-
-CompileFlags:
-   CompilationDatabase: LAUNCHXL_FLASH/.clangd
-
-Diagnostics:
-   Suppress: '*'
-

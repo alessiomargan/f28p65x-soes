@@ -30,51 +30,6 @@
 			<type>1</type>
 			<locationURI>C2000WARE_DLIB_ROOT/f28p65x/driverlib/ccs/Debug/driverlib.lib</locationURI>
 		</link>
-		<link>
-			<name>soes_test</name>
-			<type>2</type>
-			<locationURI>GIT_UC_TEST/f28p65x/soes_test</locationURI>
-		</link>
-		<link>
-			<name>soes_test_common</name>
-			<type>2</type>
-			<locationURI>GIT_UC_TEST/common_src/soes_test</locationURI>
-		</link>
-		<link>
-			<name>soes/ecat_slv.c</name>
-			<type>1</type>
-			<locationURI>GIT_SOES/soes/ecat_slv.c</locationURI>
-		</link>
-		<link>
-			<name>soes/esc.c</name>
-			<type>1</type>
-			<locationURI>GIT_SOES/soes/esc.c</locationURI>
-		</link>
-		<link>
-			<name>soes/esc_coe.c</name>
-			<type>1</type>
-			<locationURI>GIT_SOES/soes/esc_coe.c</locationURI>
-		</link>
-		<link>
-			<name>soes/esc_eep.c</name>
-			<type>1</type>
-			<locationURI>GIT_SOES/soes/esc_eep.c</locationURI>
-		</link>
-		<link>
-			<name>soes/esc_eoe.c</name>
-			<type>1</type>
-			<locationURI>GIT_SOES/soes/esc_eoe.c</locationURI>
-		</link>
-		<link>
-			<name>soes/esc_foe.c</name>
-			<type>1</type>
-			<locationURI>GIT_SOES/soes/esc_foe.c</locationURI>
-		</link>
-		<link>
-			<name>soes/esc_hw_f28p65x.c</name>
-			<type>1</type>
-			<locationURI>GIT_SOES/soes/hal/advr_esc/esc_hw_f28p65x.c</locationURI>
-		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
@@ -102,12 +57,8 @@
 			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/dsp/FPU/c28/lib</value>
 		</variable>
 		<variable>
-			<name>GIT_SOES</name>
-			<value>file:/home/amargan/work/code/firmware/SOES</value>
-		</variable>
-		<variable>
-			<name>GIT_UC_TEST</name>
-			<value>file:/home/amargan/work/code/firmware/uc_test</value>
+			<name>PROJECT_ROOT</name>
+			<value>file:/home/amargan/work/code/firmware/f28p65x-soes</value>
 		</variable>
 	</variableList>
 </projectDescription>
