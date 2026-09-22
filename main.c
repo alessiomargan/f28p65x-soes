@@ -5,9 +5,11 @@
 #include "ethercat_subdevice_cpu1_hal.h"
 #include "board.h"
 
-#include <soes/ecat_slv.h>
-#include <pins.h>
-#include <sci_io_driverlib.h>
+#include "soes/ecat_slv.h"
+#include "flash_utils.h"
+#include "globals.h"
+#include "params.h"
+#include "sci_io_driverlib.h"
 
 extern esc_cfg_t config;
 
@@ -66,7 +68,7 @@ void main()
         while(1)
         {
             // Toggle Error
-            printf("FAIL ESC_initHW\n");
+            PRINTLN("FAIL ESC_initHW");
             ESTOP0;
         }
     }
@@ -75,9 +77,38 @@ void main()
     Board_init();
     // Redirect printf/DPRINT to SCIA
     sci_stdio_init();
-
+    // 
+    print_build_info();
     // Setup and perform PDI Test
     //ESC_setupPDITestInterface();
+
+    //
+    if ( Configure_flashAPI() != Fapi_Status_Success ) {
+        PRINTLN("FAIL Configure_flashAPI");
+    }
+    if (Read_Flash_Params() == PARAMS_CMD_ERROR) {
+        //
+        //glob_fault.bit.warn_read_flash = 1;
+        PRINTLN("FAIL Read_Flash_Params");
+        if (Load_Default_Params() == PARAMS_CMD_ERROR) {
+            // FATAL ERROR
+            //Error_Handler();
+        }
+        PRINTLN("Load_Default_Params");
+    }
+
+    if ( Erase_dataFlashSector((uint32_t)&flash_sdo, sizeof(flash_sdo)) != Fapi_Status_Success ) {
+        PRINTLN("FAIL erase data sector !!!");
+    }
+
+    PRINTLN("sdo.ram.fw_ver=%s", sdo.ram.fw_ver);
+    PRINTLN("FLASH_SDO");
+    print_sdo(&flash_sdo);
+    PRINTLN("DFLT_FLASH_SDO");
+    print_sdo(&dflt_flash_sdo);
+    PRINTLN("SDO");
+    print_sdo(&sdo.flash);
+    
     // Init soes
     ecat_slv_init(&config);
 

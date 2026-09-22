@@ -41,6 +41,10 @@
 			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/driverlib</value>
 		</variable>
 		<variable>
+			<name>C2000WARE_ROOT</name>
+			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D</value>
+		</variable>
+		<variable>
 			<name>ETHERCAT_ROOT</name>
 			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/communications/Ethercat/f28p65x</value>
 		</variable>
@@ -55,6 +59,14 @@
 		<variable>
 			<name>FPU_DSP_LIB_ROOT</name>
 			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/dsp/FPU/c28/lib</value>
+		</variable>
+		<variable>
+			<name>FlashAPI_INCLUDE_ROOT</name>
+			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/flash_api/f28p65x/include/FlashAPI</value>
+		</variable>
+		<variable>
+			<name>FlashAPI_LIB_ROOT</name>
+			<value>$%7BCOM_TI_C2000WARE_INSTALL_DIR%7D/libraries/flash_api/f28p65x/lib</value>
 		</variable>
 		<variable>
 			<name>PROJECT_ROOT</name>

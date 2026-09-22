@@ -55,6 +55,7 @@
                                 <option id="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.LIBRARY.740063218" superClass="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.LIBRARY" valueType="libs">
                                     <listOptionValue value="libc.a"/>
                                 </option>
+                                <option id="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.OUTPUT_FILE.1140005835" superClass="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.linkerID.OUTPUT_FILE" value="${ProjName}.out" valueType="string"/>
                             </tool>
                             <tool id="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.objcopy.562958288" name="C2000 Objcopy Utility" superClass="com.ti.ccstudio.buildDefinitions.C2000_TICLANG_2.1.objcopy"/>
                             <tool id="com.ti.ccstudio.buildDefinitions.sysConfig.1832864355" name="SysConfig" superClass="com.ti.ccstudio.buildDefinitions.sysConfig">
@@ -79,9 +80,12 @@
                     <stringMacro name="FASTRTS_MATH_LIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/math/FPUfastRTS/c28/lib"/>
                     <stringMacro name="C2000WARE_DLIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/driverlib"/>
                     <stringMacro name="EXAMPLE_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/communications/Ethercat/f28p65x/examples/f28p65x_cpu1_pdi_hal_test_app"/>
+                    <stringMacro name="C2000WARE_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}"/>
                     <stringMacro name="C2000WARE_DEVICE_SUPPORT_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/device_support"/>
+                    <stringMacro name="FlashAPI_LIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/flash_api/f28p65x/lib"/>
                     <stringMacro name="FPU_DSP_LIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/dsp/FPU/c28/lib"/>
                     <stringMacro name="PROJECT_ROOT" type="VALUE_PATH_DIR" value="/home/amargan/work/code/firmware/f28p65x-soes"/>
+                    <stringMacro name="FlashAPI_INCLUDE_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/libraries/flash_api/f28p65x/include/FlashAPI/"/>
                 </macros>
                 <externalSettings/>
                 <extensions>
@@ -131,11 +135,12 @@
                                     <listOptionValue value="${CG_TOOL_ROOT}/include"/>
                                     <listOptionValue value="${PROJECT_ROOT}/device"/>
                                     <listOptionValue value="${PROJECT_ROOT}/external/SOES/soes/include/sys/ccs"/>
+                                    <listOptionValue value="${PROJECT_ROOT}/external/SOES"/>
                                     <listOptionValue value="${PROJECT_ROOT}/external/uc-test/f28p65x/soes_test/include"/>
                                     <listOptionValue value="${PROJECT_ROOT}/external/uc-test/common_src/soes_test/include"/>
                                     <listOptionValue value="${C2000WARE_DLIB_ROOT}/f28p65x/driverlib"/>
                                     <listOptionValue value="${C2000WARE_DEVICE_SUPPORT_ROOT}/f28p65x/common/include"/>
-                                    <listOptionValue value="${PROJECT_ROOT}/external/SOES"/>
+                                    <listOptionValue value="${FlashAPI_INCLUDE_ROOT}"/>
                                 </option>
                                 <option id="com.ti.ccstudio.buildDefinitions.C2000_25.11.compilerID.DEFINE.1854053784" superClass="com.ti.ccstudio.buildDefinitions.C2000_25.11.compilerID.DEFINE" valueType="definedSymbols">
                                     <listOptionValue value="${COM_TI_C2000WARE_SYMBOLS}"/>
@@ -170,6 +175,7 @@
                                     <listOptionValue value="${SYSCONFIG_TOOL_LIBRARY_PATH}"/>
                                     <listOptionValue value="${CG_TOOL_ROOT}/lib"/>
                                     <listOptionValue value="${CG_TOOL_ROOT}/include"/>
+                                    <listOptionValue value="${COM_TI_C2000WARE_INSTALL_DIR}/driverlib"/>
                                 </option>
                                 <option id="com.ti.ccstudio.buildDefinitions.C2000_25.11.linkerID.DIAG_WRAP.1932731703" superClass="com.ti.ccstudio.buildDefinitions.C2000_25.11.linkerID.DIAG_WRAP" value="com.ti.ccstudio.buildDefinitions.C2000_25.11.linkerID.DIAG_WRAP.off" valueType="enumerated"/>
                                 <option id="com.ti.ccstudio.buildDefinitions.C2000_25.11.linkerID.DISPLAY_ERROR_NUMBER.1660952558" superClass="com.ti.ccstudio.buildDefinitions.C2000_25.11.linkerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>
