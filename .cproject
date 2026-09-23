@@ -146,12 +146,12 @@
                                     <listOptionValue value="${COM_TI_C2000WARE_SYMBOLS}"/>
                                     <listOptionValue value="${SYSCONFIG_TOOL_SYMBOLS}"/>
                                     <listOptionValue value="F28P65X"/>
+                                    <listOptionValue value="__TMS320C28XX__"/>
+                                    <listOptionValue value="_FLASH"/>
                                     <listOptionValue value="DEBUG"/>
                                     <listOptionValue value="ESC_DEBUG"/>
-                                    <listOptionValue value="_FLASH"/>
                                     <listOptionValue value="CPU1"/>
-                                    <listOptionValue value="PDI_HAL_TEST"/>
-                                    <listOptionValue value="__TMS320C28XX__"/>
+                                    <listOptionValue value="NO_PDI_HAL_TEST"/>
                                 </option>
                                 <option id="com.ti.ccstudio.buildDefinitions.C2000_25.11.compilerID.C_DIALECT.2085706286" superClass="com.ti.ccstudio.buildDefinitions.C2000_25.11.compilerID.C_DIALECT" value="com.ti.ccstudio.buildDefinitions.C2000_25.11.compilerID.C_DIALECT.C11" valueType="enumerated"/>
                                 <option id="com.ti.ccstudio.buildDefinitions.C2000_25.11.compilerID.DIAG_WARNING.546064743" superClass="com.ti.ccstudio.buildDefinitions.C2000_25.11.compilerID.DIAG_WARNING" valueType="stringList">

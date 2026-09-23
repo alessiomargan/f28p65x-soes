@@ -13,6 +13,9 @@
 /**
  * Import the modules used in this configuration.
  */
+const led            = scripting.addModule("/driverlib/board_components/led", {}, false);
+const led1           = led.addInstance();
+const led2           = led.addInstance();
 const cputimer       = scripting.addModule("/driverlib/cputimer.js", {}, false);
 const cputimer1      = cputimer.addInstance();
 const device_support = scripting.addModule("/driverlib/device_support.js");
@@ -25,6 +28,14 @@ const sci1           = sci.addInstance();
 /**
  * Write custom configuration values to the imported modules.
  */
+led1.$hardware              = system.deviceData.board.components.D1;
+led1.$name                  = "DEVICE_LED1";
+led1.gpio.writeInitialValue = true;
+
+led2.$hardware              = system.deviceData.board.components.D2;
+led2.$name                  = "DEVICE_LED2";
+led2.gpio.writeInitialValue = true;
+
 cputimer1.cputimerBase             = "CPUTIMER2_BASE";
 cputimer1.$name                    = "myCPUTIMER2";
 cputimer1.timerPeriod              = 199999;
@@ -32,15 +43,15 @@ cputimer1.enableInterrupt          = true;
 cputimer1.registerInterrupts       = true;
 cputimer1.timerInt.enableInterrupt = true;
 
-gpio1.$name           = "dbg_1";
-gpio1.direction       = "GPIO_DIR_MODE_OUT";
+gpio1.$name             = "dbg_1";
+gpio1.direction         = "GPIO_DIR_MODE_OUT";
 gpio1.writeInitialValue = true;
-gpio1.gpioPin.$assign = "hsecDigital.89";
+gpio1.gpioPin.$assign   = "hsecDigital.89";
 
-gpio2.$name           = "dbg_2";
-gpio2.direction       = "GPIO_DIR_MODE_OUT";
+gpio2.$name             = "dbg_2";
+gpio2.direction         = "GPIO_DIR_MODE_OUT";
 gpio2.writeInitialValue = true;
-gpio2.gpioPin.$assign = "hsecDigital.91";
+gpio2.gpioPin.$assign   = "hsecDigital.91";
 
 sci1.$name        = "mySCIA";
 sci1.$hardware    = system.deviceData.board.components.SCI_LOC1;
@@ -52,6 +63,8 @@ sci1.txQual.$name = "myGPIOQUAL1";
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
  * re-solve from scratch.
  */
+led1.gpio.gpioPin.$suggestSolution  = "hsecDigital.82";
+led2.gpio.gpioPin.$suggestSolution  = "hsecDigital.86";
 sci1.sci.$suggestSolution           = "SCIA";
 sci1.sci.sci_rxPin.$suggestSolution = "hsecDigital.76";
 sci1.sci.sci_txPin.$suggestSolution = "hsecDigital.78";

@@ -41,12 +41,12 @@ void INT_myCPUTIMER2_ISR(void) {
         dcSyncLedTicks++;
         if (dcSyncLedTicks >= DC_SYNC_LED_TOGGLE_TICKS) {
             dcSyncLedTicks = 0U;
-            GPIO_togglePin(DEVICE_GPIO_PIN_LED2);
+            GPIO_togglePin(DEVICE_LED2_GPIO);
         }
     }
     else {
         dcSyncLedTicks = 0U;
-        GPIO_writePin(DEVICE_GPIO_PIN_LED2, 1U);
+        GPIO_writePin(DEVICE_LED2_GPIO, 1U);
     }
 
     GPIO_writePin(dbg_1, 0);
@@ -75,6 +75,7 @@ void main()
 
     // Syscfg generate initialization
     Board_init();
+
     // Redirect printf/DPRINT to SCIA
     sci_stdio_init();
     // 
@@ -97,9 +98,9 @@ void main()
         PRINTLN("Load_Default_Params");
     }
 
-    if ( Erase_dataFlashSector((uint32_t)&flash_sdo, sizeof(flash_sdo)) != Fapi_Status_Success ) {
-        PRINTLN("FAIL erase data sector !!!");
-    }
+    //if ( Erase_dataFlashSector((uint32_t)&flash_sdo, sizeof(flash_sdo)) != Fapi_Status_Success ) {
+    //    PRINTLN("FAIL erase data sector !!!");
+    //}
 
     PRINTLN("sdo.ram.fw_ver=%s", sdo.ram.fw_ver);
     PRINTLN("FLASH_SDO");
@@ -120,7 +121,7 @@ void main()
     {
         //ESC_debugUpdateESCRegLogs();
         DEVICE_DELAY_US((uint32_t)(500000));
-        GPIO_togglePin(DEVICE_GPIO_PIN_LED1);
+        GPIO_togglePin(DEVICE_LED1_GPIO);
         
     }
 }

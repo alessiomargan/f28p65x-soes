@@ -62,3 +62,6 @@ LAUNCHXL_FLASH/
 .clangd
 
 .codex/
+
+# This repository intentionally provides a top-level build/flash wrapper.
+!Makefile
