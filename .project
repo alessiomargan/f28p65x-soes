@@ -24,13 +24,6 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>driverlib.lib</name>
-			<type>1</type>
-			<locationURI>C2000WARE_DLIB_ROOT/f28p65x/driverlib/ccs/Debug/driverlib.lib</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>C2000WARE_DEVICE_SUPPORT_ROOT</name>
@@ -70,7 +63,7 @@
 		</variable>
 		<variable>
 			<name>PROJECT_ROOT</name>
-			<value>file:/home/amargan/work/code/firmware/f28p65x-soes</value>
+			<value>file:/Users/amargan/work/code/firmware/f28p65x-soes</value>
 		</variable>
 	</variableList>
 </projectDescription>

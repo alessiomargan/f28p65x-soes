@@ -1,0 +1,5 @@
+# Tracked macOS defaults. Override with environment variables or make VAR=value.
+CCS_INSTALL_DIR ?= /Applications/ti/ccs2100
+CCS_CLI ?= $(CCS_INSTALL_DIR)/ccs/ccs-server.app/Contents/MacOS/ccs-server-cli.sh
+# Adjust DSLITE to the installed UniFlash location on this host.
+DSLITE ?= /Applications/ti/uniflash_9.6.0/dslite.sh

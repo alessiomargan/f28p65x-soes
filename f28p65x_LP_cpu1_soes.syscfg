@@ -13,6 +13,9 @@
 /**
  * Import the modules used in this configuration.
  */
+const led            = scripting.addModule("/driverlib/board_components/led", {}, false);
+const led1           = led.addInstance();
+const led2           = led.addInstance();
 const cputimer       = scripting.addModule("/driverlib/cputimer.js", {}, false);
 const cputimer1      = cputimer.addInstance();
 const device_support = scripting.addModule("/driverlib/device_support.js");
@@ -25,6 +28,13 @@ const sci1           = sci.addInstance();
 /**
  * Write custom configuration values to the imported modules.
  */
+led1.$hardware              = system.deviceData.board.components.LED4;
+led1.$name                  = "DEVICE_LED1";
+led1.gpio.writeInitialValue = true;
+
+led2.$name     = "DEVICE_LED2";
+led2.$hardware = system.deviceData.board.components.LED5;
+
 cputimer1.cputimerBase             = "CPUTIMER2_BASE";
 cputimer1.$name                    = "myCPUTIMER2";
 cputimer1.timerPeriod              = 199999;
@@ -52,6 +62,8 @@ sci1.txQual.$name = "myGPIOQUAL1";
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
  * re-solve from scratch.
  */
+led1.gpio.gpioPin.$suggestSolution  = "boosterpack1.13";
+led2.gpio.gpioPin.$suggestSolution  = "boosterpack2.53";
 sci1.sci.$suggestSolution           = "SCIA";
 sci1.sci.sci_rxPin.$suggestSolution = "boosterpack1.3";
 sci1.sci.sci_txPin.$suggestSolution = "boosterpack1.4";

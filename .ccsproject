@@ -16,4 +16,5 @@
 	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
 	<isTargetManual value="false"/>
 	<activeTargetConfiguration value="TMS320F28P650DK9.ccxml"/>
+	<convertedVirtualResources value="driverlib.lib::(type=1;location=C2000WARE_DLIB_ROOT/f28p65x/driverlib/ccs/Debug/driverlib.lib;)"/>
 </projectOptions>

@@ -1,0 +1,4 @@
+# Tracked Linux defaults. Override with environment variables or make VAR=value.
+CCS_INSTALL_DIR ?= $(HOME)/ti/ccs2100
+CCS_CLI ?= $(CCS_INSTALL_DIR)/ccs/eclipse/ccs-server-cli.sh
+DSLITE ?= $(HOME)/ti/uniflash_9.6.0/dslite.sh

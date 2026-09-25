@@ -65,3 +65,9 @@ LAUNCHXL_FLASH/
 
 # This repository intentionally provides a top-level build/flash wrapper.
 !Makefile
+!Makefile.linux_local
+!Makefile.darwin_local
+
+!FAPI_F28P65x_EABI_v3.00.02.lib
+!driverlib.lib
+

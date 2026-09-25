@@ -1,19 +1,26 @@
 # Top-level helper Makefile for CCS-managed F28P65x builds and UniFlash.
 
 PROJECT_NAME ?= f28p65x-soes
-CONFIG ?= FLASH
+#CONFIG ?= FLASH
+CONFIG ?= LAUNCHXL_FLASH
 
-CCS_INSTALL_DIR ?= /home/amargan/ti/ccs2100
-CCS_CLI ?= $(CCS_INSTALL_DIR)/ccs/eclipse/ccs-server-cli.sh
+HOST_OS ?= $(shell uname -s)
+ifeq ($(HOST_OS),Linux)
+include Makefile.linux_local
+else ifeq ($(HOST_OS),Darwin)
+include Makefile.darwin_local
+else
+$(error Unsupported HOST_OS '$(HOST_OS)': expected Linux or Darwin)
+endif
+
 CCS_WORKSPACE ?= /tmp/$(USER)-$(PROJECT_NAME)-ccs-workspace
 
-DSLITE ?= /home/amargan/ti/uniflash_9.6.0/dslite.sh
 TARGET_CONFIG_FILE ?= $(CURDIR)/TMS320F28P650DK9.ccxml
 CORE ?= 0
 
 OUT_FILE := $(CURDIR)/$(CONFIG)/$(PROJECT_NAME).out
 
-CCS_BUILD = $(CCS_CLI) \
+CCS_BUILD = "$(CCS_CLI)" \
 	-workspace "$(CCS_WORKSPACE)" \
 	-application projectBuild \
 	-ccs.locations "$(CURDIR)" \
@@ -22,7 +29,7 @@ CCS_BUILD = $(CCS_CLI) \
 	-ccs.autoOpen \
 	-ccs.listProblems
 
-DSLITE_FLASH = $(DSLITE) \
+DSLITE_FLASH = "$(DSLITE)" \
 	--config="$(TARGET_CONFIG_FILE)" \
 	--core=$(CORE) \
 	--flash \
@@ -32,6 +39,7 @@ DSLITE_FLASH = $(DSLITE) \
 
 help:
 	@echo "Usage: make <target> [VAR=value]"
+	@echo "Host platform: $(HOST_OS) (defaults in Makefile.*_local)"
 	@echo ""
 	@echo "Targets:"
 	@echo "  build       Build the CCS $(CONFIG) configuration"
@@ -85,8 +93,8 @@ flash-run: build
 
 list-cores:
 	@test -x "$(DSLITE)" || { echo "UniFlash CLI not found: $(DSLITE)"; exit 1; }
-	@$(DSLITE) --config="$(TARGET_CONFIG_FILE)" --list-cores
+	@"$(DSLITE)" --config="$(TARGET_CONFIG_FILE)" --list-cores
 
 list-ops:
 	@test -x "$(DSLITE)" || { echo "UniFlash CLI not found: $(DSLITE)"; exit 1; }
-	@$(DSLITE) --config="$(TARGET_CONFIG_FILE)" --list-ops
+	@"$(DSLITE)" --config="$(TARGET_CONFIG_FILE)" --list-ops
