@@ -1225,7 +1225,6 @@ ESC_initHW(void)
     GPIO_setQualificationMode(8,GPIO_QUAL_ASYNC);
 
     #else 
-
     //
     // PHY Reset
     //
@@ -1286,7 +1285,7 @@ ESC_initHW(void)
     //
     GPIO_setPinConfig(GPIO_148_ESC_PHY0_LINKSTATUS);
     GPIO_setPadConfig(148,GPIO_PIN_TYPE_INVERT);
-    GPIO_setQualificationMode(146,GPIO_QUAL_ASYNC);
+    GPIO_setQualificationMode(148,GPIO_QUAL_ASYNC);
 
     GPIO_setPinConfig(GPIO_58_ESC_LED_LINK0_ACTIVE);
     GPIO_setQualificationMode(58, GPIO_QUAL_ASYNC);
@@ -1376,7 +1375,7 @@ ESC_initHW(void)
 
     GPIO_setPinConfig(GPIO_0_ESC_GPI0);
     GPIO_setQualificationMode(0,GPIO_QUAL_ASYNC);
-
+ 
     GPIO_setPinConfig(GPIO_8_ESC_GPO0);
     GPIO_setQualificationMode(8,GPIO_QUAL_ASYNC);
 
@@ -1438,6 +1437,7 @@ ESC_initHW(void)
     // Reset ESC
     //
     ESC_resetESC();
+
 
 #ifdef PDI_HAL_TEST
     //
@@ -1568,8 +1568,6 @@ ESC_applicationSync0Handler(void)
     Sync0_Isr();
 #endif  // DC_SUPPORTED
 #endif  // ETHERCAT_STACK
-
-    Sync0_Isr();
 
     //
     // Acknowledge and clear interrupt in ESCSS

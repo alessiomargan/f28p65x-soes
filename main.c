@@ -11,45 +11,78 @@
 #include "params.h"
 #include "sci_io_driverlib.h"
 
+extern void EtherCAT_init(void);
+
 extern esc_cfg_t config;
 
-#define DC_SYNC_LED_TOGGLE_TICKS    125U
+static volatile uint16_t fatalErrorCode = 0U;
 
 __attribute__((section(".TI.ramfunc")))
-void Sync0_Isr(void) {
+void FatalError_Handler(uint16_t errorCode)
+{
+    /* Prevent interrupts from changing application state or debug outputs. */
+    DINT;
 
-    GPIO_writePin(dbg_2, 1);
-    ecat_slv();
-    GPIO_writePin(dbg_2, 0);
+    /* Preserve the error for the debugger and expose its low two bits. */
+    fatalErrorCode = errorCode;
+    GPIO_writePin(dbg_1, (uint32_t)(errorCode & 1U));
+    GPIO_writePin(dbg_2, (uint32_t)((errorCode >> 1U) & 1U));
+    GPIO_writePin(dbg_3, (uint32_t)((errorCode >> 2U) & 1U));
+
+    /* The controlCARD LEDs are active-low. */
+    GPIO_writePin(DEVICE_LED1_GPIO, 0U);
+    GPIO_writePin(DEVICE_LED2_GPIO, 0U);
+
+    /* Halt under a debugger and never resume normal execution. */
+    ESTOP0;
+    for(;;) {}
 }
+
+/*  Initialize device clock and peripherals
+    Copy the Flash initialization code from Flash to RAM
+    Configure Flash wait-states, fall back power mode, performance features
+    GPIO unlock
+    PIE/vector table
+*/
+static void Device_BaseInit(void) {
+
+    // Disable the watchdog
+    SysCtl_disableWatchdog();
+
+#ifdef _FLASH
+    // Copy time critical code and flash setup code to RAM. This includes the
+    // following functions: Flash_initModule();
+    // The RamfuncsLoadStart, RamfuncsLoadSize, and RamfuncsRunStart symbols
+    // are created by the linker. Refer to the device .cmd file.
+    memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (size_t)&RamfuncsLoadSize);
+    // Call Flash Initialization to setup flash waitstates. This function must
+    // reside in RAM.
+    Flash_initModule(FLASH0CTRL_BASE, FLASH0ECC_BASE, DEVICE_FLASH_WAITSTATES);
+#endif
     
-
-__interrupt
-void INT_myCPUTIMER2_ISR(void) {
-    static uint16_t dcSyncLedTicks = 0U;
-    uint8_t syncActivation;
-
-    GPIO_writePin(dbg_1, 1);
-
-    syncActivation = ESC_SYNCactivation();
-    if (syncActivation == 0U) {
-		ecat_slv();
-	}
-
-    if ((syncActivation & (ESCREG_SYNC_ACT_ACTIVATED |
-                           ESCREG_SYNC_AUTO_ACTIVATED)) != 0U) {
-        dcSyncLedTicks++;
-        if (dcSyncLedTicks >= DC_SYNC_LED_TOGGLE_TICKS) {
-            dcSyncLedTicks = 0U;
-            GPIO_togglePin(DEVICE_LED2_GPIO);
-        }
-    }
-    else {
-        dcSyncLedTicks = 0U;
-        GPIO_writePin(DEVICE_LED2_GPIO, 1U);
+    // Verify the XTAL crystal frequency.
+    if(!Device_verifyXTAL(DEVICE_OSCSRC_FREQ / 1000000)) {
+        ESTOP0;
+        for(;;) {}
     }
 
-    GPIO_writePin(dbg_1, 0);
+    // Set up device clock
+    SysCtl_setClock(DEVICE_SETCLOCK_CFG);
+
+    // Make sure the LSPCLK divider is set to the default (divide by 4)
+    SysCtl_setLowSpeedClock(SYSCTL_LSPCLK_PRESCALE_4);
+
+    // Turn on all peripherals and initialize GPIOs
+    Device_enableAllPeripherals();
+    Device_initGPIO();
+
+    // Initialize PIE and clear PIE registers. Disables CPU interrupts.
+    Interrupt_initModule();
+
+    // Initialize the PIE vector table with pointers to the shell Interrupt
+    // Service Routines (ISR).
+    Interrupt_initVectorTable();
+
 }
 
 //
@@ -57,50 +90,31 @@ void INT_myCPUTIMER2_ISR(void) {
 //
 void main()
 {
-    uint16_t initStatus;
-
-    // Initialize CPU1 and HAL interface
-    initStatus = ESC_initHW();
-
-    // Loop and signal error if initHW returns failure
-    if(initStatus == ESC_HW_INIT_FAIL)
-    {
-        while(1)
-        {
-            // Toggle Error
-            PRINTLN("FAIL ESC_initHW");
-            ESTOP0;
-        }
-    }
-
+    // clocks, Flash, GPIO unlock, PIE/vector table
+    Device_BaseInit();
     // Syscfg generate initialization
     Board_init();
-
+    // Configure EtherCAT after SysConfig so its pin mux and interrupts remain active
+    EtherCAT_init();
     // Redirect printf/DPRINT to SCIA
     sci_stdio_init();
     // 
     print_build_info();
-    // Setup and perform PDI Test
-    //ESC_setupPDITestInterface();
 
     //
     if ( Configure_flashAPI() != Fapi_Status_Success ) {
         PRINTLN("FAIL Configure_flashAPI");
+        FatalError_Handler(FATAL_ERROR_FLASH_API);
     }
     if (Read_Flash_Params() == PARAMS_CMD_ERROR) {
         //
         //glob_fault.bit.warn_read_flash = 1;
         PRINTLN("FAIL Read_Flash_Params");
         if (Load_Default_Params() == PARAMS_CMD_ERROR) {
-            // FATAL ERROR
-            //Error_Handler();
+            FatalError_Handler(FATAL_ERROR_DEFAULT_PARAMS);
         }
         PRINTLN("Load_Default_Params");
     }
-
-    //if ( Erase_dataFlashSector((uint32_t)&flash_sdo, sizeof(flash_sdo)) != Fapi_Status_Success ) {
-    //    PRINTLN("FAIL erase data sector !!!");
-    //}
 
     PRINTLN("sdo.ram.fw_ver=%s", sdo.ram.fw_ver);
     PRINTLN("FLASH_SDO");
@@ -116,13 +130,13 @@ void main()
     // start timer 
     CPUTimer_startTimer(myCPUTIMER2_BASE);
 
-    // Update local RAM with ESC register values for debugging
+    // Enable interrupts to CPU
+    EINT;
+
     while(1)
     {
-        //ESC_debugUpdateESCRegLogs();
         DEVICE_DELAY_US((uint32_t)(500000));
         GPIO_togglePin(DEVICE_LED1_GPIO);
-        
     }
 }
 

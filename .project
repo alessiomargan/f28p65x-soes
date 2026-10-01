@@ -63,7 +63,7 @@
 		</variable>
 		<variable>
 			<name>PROJECT_ROOT</name>
-			<value>file:/Users/amargan/work/code/firmware/f28p65x-soes</value>
+			<value>file:/home/amargan/work/code/firmware/f28p65x-soes</value>
 		</variable>
 	</variableList>
 </projectDescription>

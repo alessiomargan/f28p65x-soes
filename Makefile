@@ -1,8 +1,8 @@
 # Top-level helper Makefile for CCS-managed F28P65x builds and UniFlash.
 
 PROJECT_NAME ?= f28p65x-soes
-#CONFIG ?= FLASH
-CONFIG ?= LAUNCHXL_FLASH
+CONFIG ?= FLASH
+#CONFIG ?= LAUNCHXL_FLASH
 
 HOST_OS ?= $(shell uname -s)
 ifeq ($(HOST_OS),Linux)

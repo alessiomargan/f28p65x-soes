@@ -22,6 +22,7 @@ const device_support = scripting.addModule("/driverlib/device_support.js");
 const gpio           = scripting.addModule("/driverlib/gpio.js", {}, false);
 const gpio1          = gpio.addInstance();
 const gpio2          = gpio.addInstance();
+const gpio5          = gpio.addInstance();
 const sci            = scripting.addModule("/driverlib/sci.js", {}, false);
 const sci1           = sci.addInstance();
 
@@ -36,6 +37,15 @@ led2.$hardware              = system.deviceData.board.components.D2;
 led2.$name                  = "DEVICE_LED2";
 led2.gpio.writeInitialValue = true;
 
+const divider6       = system.clockTree["ECATDIV"];
+divider6.divideValue = 2;
+
+const divider8       = system.clockTree["EPWMCLKDIV"];
+divider8.divideValue = 1;
+
+const mux5       = system.clockTree["DIVSRCSEL"];
+mux5.inputSelect = "PLLCLK";
+
 cputimer1.cputimerBase             = "CPUTIMER2_BASE";
 cputimer1.$name                    = "myCPUTIMER2";
 cputimer1.timerPeriod              = 199999;
@@ -46,12 +56,17 @@ cputimer1.timerInt.enableInterrupt = true;
 gpio1.$name             = "dbg_1";
 gpio1.direction         = "GPIO_DIR_MODE_OUT";
 gpio1.writeInitialValue = true;
-gpio1.gpioPin.$assign   = "hsecDigital.89";
+gpio1.gpioPin.$assign   = "hsecDigital.91";
 
 gpio2.$name             = "dbg_2";
 gpio2.direction         = "GPIO_DIR_MODE_OUT";
 gpio2.writeInitialValue = true;
-gpio2.gpioPin.$assign   = "hsecDigital.91";
+gpio2.gpioPin.$assign   = "hsecDigital.93";
+
+gpio5.$name             = "dbg_3";
+gpio5.direction         = "GPIO_DIR_MODE_OUT";
+gpio5.writeInitialValue = true;
+gpio5.gpioPin.$assign   = "hsecDigital.95";
 
 sci1.$name        = "mySCIA";
 sci1.$hardware    = system.deviceData.board.components.SCI_LOC1;
