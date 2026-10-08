@@ -16,13 +16,15 @@
 const led            = scripting.addModule("/driverlib/board_components/led", {}, false);
 const led1           = led.addInstance();
 const led2           = led.addInstance();
+const can            = scripting.addModule("/driverlib/can.js", {}, false);
+const can1           = can.addInstance();
 const cputimer       = scripting.addModule("/driverlib/cputimer.js", {}, false);
 const cputimer1      = cputimer.addInstance();
 const device_support = scripting.addModule("/driverlib/device_support.js");
 const gpio           = scripting.addModule("/driverlib/gpio.js", {}, false);
 const gpio1          = gpio.addInstance();
 const gpio2          = gpio.addInstance();
-const gpio5          = gpio.addInstance();
+const gpio3          = gpio.addInstance();
 const sci            = scripting.addModule("/driverlib/sci.js", {}, false);
 const sci1           = sci.addInstance();
 
@@ -36,6 +38,25 @@ led1.gpio.writeInitialValue = true;
 led2.$hardware              = system.deviceData.board.components.D2;
 led2.$name                  = "DEVICE_LED2";
 led2.gpio.writeInitialValue = true;
+
+can1.$name                   = "myCAN0";
+can1.bitRate                 = "250000";
+can1.enableInterrupt         = true;
+can1.registerInterrupts      = true;
+can1.interruptFlags          = ["CAN_INT_ERROR","CAN_INT_IE0","CAN_INT_STATUS"];
+can1.interruptLine           = ["CAN_GLOBAL_INT_CANINT0"];
+can1.msgObjsUsed             = [1,2];
+can1.can.can_rxPin.$assign   = "hsecDigital.122";
+can1.can.can_txPin.$assign   = "hsecDigital.123";
+can1.can0Int.enableInterrupt = true;
+can1.msgObj1.$name           = "msgObj1";
+can1.msgObj1.flags           = ["CAN_MSG_OBJ_RX_INT_ENABLE"];
+can1.msgObj1.msgID           = 4;
+can1.msgObj2.$name           = "msgObj0";
+can1.msgObj2.msgType         = "CAN_MSG_OBJ_TYPE_TX";
+can1.msgObj2.flags           = ["CAN_MSG_OBJ_TX_INT_ENABLE"];
+can1.msgObj2.msgLen          = 8;
+can1.msgObj2.msgID           = 5;
 
 const divider6       = system.clockTree["ECATDIV"];
 divider6.divideValue = 2;
@@ -63,10 +84,10 @@ gpio2.direction         = "GPIO_DIR_MODE_OUT";
 gpio2.writeInitialValue = true;
 gpio2.gpioPin.$assign   = "hsecDigital.93";
 
-gpio5.$name             = "dbg_3";
-gpio5.direction         = "GPIO_DIR_MODE_OUT";
-gpio5.writeInitialValue = true;
-gpio5.gpioPin.$assign   = "hsecDigital.95";
+gpio3.$name             = "dbg_3";
+gpio3.direction         = "GPIO_DIR_MODE_OUT";
+gpio3.writeInitialValue = true;
+gpio3.gpioPin.$assign   = "hsecDigital.95";
 
 sci1.$name        = "mySCIA";
 sci1.$hardware    = system.deviceData.board.components.SCI_LOC1;
@@ -80,6 +101,7 @@ sci1.txQual.$name = "myGPIOQUAL1";
  */
 led1.gpio.gpioPin.$suggestSolution  = "hsecDigital.82";
 led2.gpio.gpioPin.$suggestSolution  = "hsecDigital.86";
+can1.can.$suggestSolution           = "CANA";
 sci1.sci.$suggestSolution           = "SCIA";
 sci1.sci.sci_rxPin.$suggestSolution = "hsecDigital.76";
 sci1.sci.sci_txPin.$suggestSolution = "hsecDigital.78";

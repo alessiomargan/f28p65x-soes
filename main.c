@@ -85,6 +85,7 @@ static void Device_BaseInit(void) {
 
 }
 
+extern uint16_t txMsgData[];
 //
 // Main
 //
@@ -137,6 +138,8 @@ void main()
     {
         DEVICE_DELAY_US((uint32_t)(500000));
         GPIO_togglePin(DEVICE_LED1_GPIO);
+        CAN_sendMessage(CANA_BASE, 2, 8, txMsgData);
+
     }
 }
 

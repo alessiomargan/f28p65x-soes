@@ -59,7 +59,7 @@ MEMORY
 SECTIONS
 {
    codestart        : > BEGIN
-   .text            : >> FLASH_BANK0 | FLASH_BANK1, ALIGN(8)
+   .text            : >> FLASH_BANK0, ALIGN(8)
    .cinit           : > FLASH_BANK0, ALIGN(8)
    .switch          : > FLASH_BANK0, ALIGN(8)
    .reset           : > RESET, TYPE = DSECT /* not used, */
