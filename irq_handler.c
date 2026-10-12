@@ -8,9 +8,10 @@
 
 #define RX_MSG_OBJ_ID 1
 
-__attribute__((section("ramgs0")))
+// Initialized data in RAMGS0 for DMA; separate from the NOINIT EtherCAT buffers.
+__attribute__((section(".data:can_dma"), aligned(2)))
 uint16_t txMsgData[8] = { 0xF0, 0xCA, 0xCC, 0x1A, 0x00, 0x00, 0x00, 0x00 };
-__attribute__((section("ramgs0")))
+__attribute__((section(".data:can_dma"), aligned(2)))
 uint16_t rxMsgData[8] = {0};
 
 __attribute__((section(".TI.ramfunc")))
@@ -60,7 +61,7 @@ __interrupt void INT_myCPUTIMER2_ISR(void) {
         GPIO_writePin(DEVICE_LED2_GPIO, 1U);
     }
     
-    //CAN_sendMessage(CANA_BASE, 2, 8, txMsgData);
+    CAN_sendMessage(CANA_BASE, 2, 8, txMsgData);
 
     GPIO_writePin(dbg_1, 0);
 }

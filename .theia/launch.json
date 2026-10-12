@@ -27,6 +27,28 @@
                     "C28xx_CPU1"
                 ]
             }
+        },
+        {
+            "name": "f28p65x-soes (1)",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "f28p65x-soes",
+                "resourceId": "/f28p65x-soes/__ccs_3_compilerIncludes"
+            },
+            "connections": [
+                {
+                    "name": "Texas Instruments XDS110 USB Debug Probe_0",
+                    "cores": [
+                        {
+                            "name": "C28xx_CPU1",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues/>\n"
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

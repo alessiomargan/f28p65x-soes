@@ -70,6 +70,7 @@ SECTIONS
    .bss:output      : > RAMLS3
    .init_array      : > RAMM0
    .const           : > RAMLS5 | RAMLS6
+   .data:can_dma     : > RAMGS0, ALIGN(2)
    .data            : > RAMLS5
    .sysmem          : > RAMLS4
 #else
