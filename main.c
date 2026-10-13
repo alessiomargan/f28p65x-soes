@@ -85,7 +85,6 @@ static void Device_BaseInit(void) {
 
 }
 
-extern uint16_t txMsgData[];
 //
 // Main
 //
@@ -131,15 +130,14 @@ void main()
     // start timer 
     CPUTimer_startTimer(myCPUTIMER2_BASE);
 
-    // Enable interrupts to CPU
+    // Enable Global Interrupt (INTM) and realtime interrupt (DBGM)
     EINT;
+    ERTM;
 
     while(1)
     {
         DEVICE_DELAY_US((uint32_t)(500000));
         GPIO_togglePin(DEVICE_LED1_GPIO);
-        //CAN_sendMessage(CANA_BASE, 2, 8, txMsgData);
-
     }
 }
 

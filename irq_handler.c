@@ -6,13 +6,79 @@
 
 #define DC_SYNC_LED_TOGGLE_TICKS    125U
 
-#define RX_MSG_OBJ_ID 1
+#define CAN_RX_MSG_OBJ  1U
+#define CAN_TX_MSG_OBJ  2U
+
+#define CAN_RTR_0x100_MSG_OBJ       3U
+#define CAN_RTR_0x101_MSG_OBJ       4U
+#define CAN_RTR_0x102_MSG_OBJ       5U
+#define CAN_RTR_0x103_MSG_OBJ       6U
+#define CAN_RTR_0x104_MSG_OBJ       7U
+#define CAN_RTR_0x105_MSG_OBJ       8U
+
+#define CAN_RTR_RESPONSE_COUNT      6U
+#define CAN_RTR_RESPONSE_LENGTH     8U
 
 // Initialized data in RAMGS0 for DMA; separate from the NOINIT EtherCAT buffers.
 __attribute__((section(".data:can_dma"), aligned(2)))
 uint16_t txMsgData[8] = { 0xF0, 0xCA, 0xCC, 0x1A, 0x00, 0x00, 0x00, 0x00 };
 __attribute__((section(".data:can_dma"), aligned(2)))
 uint16_t rxMsgData[8] = {0};
+
+__attribute__((section(".data:can_rtr"), aligned(2)))
+uint16_t rtrMsgData[CAN_RTR_RESPONSE_COUNT][CAN_RTR_RESPONSE_LENGTH] = {
+    { 0xF0, 0xCA, 0xCC, 0x1A, 0xBE, 0xEF, 0x00, 0x00 },
+    { 0xF0, 0xCA, 0xCC, 0x1A, 0xBE, 0xEF, 0x00, 0x00 },
+    { 0xF0, 0xCA, 0xCC, 0x1A, 0xBE, 0xEF, 0x00, 0x00 },
+    { 0xF0, 0xCA, 0xCC, 0x1A, 0xBE, 0xEF, 0x00, 0x00 },
+    { 0xF0, 0xCA, 0xCC, 0x1A, 0xBE, 0xEF, 0x00, 0x00 },
+    { 0xF0, 0xCA, 0xCC, 0x1A, 0xBE, 0xEF, 0x00, 0x00 },
+};
+
+static uint16_t msgCount;
+
+/*
+ * The safest general solution is a small lock/critical section around every complete IF-register transaction.
+ * DriverLib itself does not provide locking or reentrancy.
+ * This protects against maskable CPU1 interrupts.
+ * It does not protect against DMA, CLA, CPU2, or another execution context accessing the same CAN interface registers;
+ * those contexts would need separate ownership or synchronization.
+ */
+static inline void CAN_loadRTRResponseLocked(uint32_t messageObject,
+                                      const uint16_t payload[8])
+{
+    bool interruptsWereDisabled;
+
+    // Prevent an ISR containing CAN_sendMessage() from using IF1
+    // during this complete transaction.
+    interruptsWereDisabled = Interrupt_disableGlobal();
+
+    // Wait until any previous IF1 transaction has completed.
+    while((HWREGH(CANA_BASE + CAN_O_IF1CMD) &
+           CAN_IF1CMD_BUSY) != 0U) { }
+
+    // Load the IF1 staging data registers.
+    CAN_writeDataReg(payload,
+                     CANA_BASE + CAN_O_IF1DATA,
+                     8U);
+    
+    // Copy data bytes into message RAM without TXRQST.
+    // The message ID, mask, DLC and RTR configuration remain unchanged.
+    HWREG_BP(CANA_BASE + CAN_O_IF1CMD) =
+        (uint32_t)CAN_IF1CMD_DIR |
+        (uint32_t)CAN_IF1CMD_DATA_A |
+        (uint32_t)CAN_IF1CMD_DATA_B |
+        (messageObject & CAN_IF1CMD_MSG_NUM_M);
+
+    // Keep the lock until message RAM has received the data.
+    while((HWREGH(CANA_BASE + CAN_O_IF1CMD) &
+           CAN_IF1CMD_BUSY) != 0U) { }
+
+    // Restore interrupts only if they were enabled before this call.
+    if(!interruptsWereDisabled) {
+        (void)Interrupt_enableGlobal();
+    }
+}
 
 __attribute__((section(".TI.ramfunc")))
 __interrupt void Sync0_Isr(void) {
@@ -61,8 +127,13 @@ __interrupt void INT_myCPUTIMER2_ISR(void) {
         GPIO_writePin(DEVICE_LED2_GPIO, 1U);
     }
     
-    CAN_sendMessage(CANA_BASE, 2, 8, txMsgData);
-
+    //CAN_sendMessage(CANA_BASE, CAN_TX_MSG_OBJ, 8, txMsgData);
+    for (int i=0; i<CAN_RTR_RESPONSE_COUNT; i++) {
+        msgCount ++;
+        rtrMsgData[i][7] ++;
+        CAN_loadRTRResponseLocked(CAN_RTR_0x100_MSG_OBJ+i, rtrMsgData[i]);
+    }
+    
     GPIO_writePin(dbg_1, 0);
 }
 
@@ -88,18 +159,41 @@ __interrupt void INT_myCAN0_0_ISR(void) {
             // Something went wrong. rData doesn't contain expected data.
             ESTOP0;
         }
-    } else if(status == 2U) {
-        // Getting to this point means that the TX interrupt occurred on
-        // message object 2, and the message TX is complete.  Clear the
-        // message object interrupt.
-        CAN_clearInterruptStatus(CANA_BASE, 2U);
-    } else if(status == 1U) {
-        // Getting to this point means that the RX interrupt occurred on
-        // message object 1, and the message RX is complete.  Clear the
-        // message object interrupt.
-        CAN_clearInterruptStatus(CANA_BASE, 1U);
-    } // If something unexpected caused the interrupt, this would handle it.
-    else {
+    } else if((status >= 1U) && (status <= 32U)) {
+        // A mailbox number (status) does not say whether the event was RX or TX.
+        // Its configured type tells you that.
+        // For example, cause CAN_RTR_0x100_MSG_OBJ on an RXTX_REMOTE object
+        // with transmit interrupts enabled means its automatic response completed.
+        switch (status) {
+            case CAN_TX_MSG_OBJ:
+                // Getting to this point means that the TX interrupt occurred on
+                // message object CAN_TX_MSG_OBJ, and the message TX is complete.
+                break;
+            case CAN_RX_MSG_OBJ :
+                // Getting to this point means that the RX interrupt occurred on
+                // message object CAN_RX_MSG_OBJ, and the message RX is complete.
+                (void)CAN_readMessage(CANA_BASE,
+                          CAN_RX_MSG_OBJ,
+                          rxMsgData);
+                break;
+            case CAN_RTR_0x100_MSG_OBJ :      
+            case CAN_RTR_0x101_MSG_OBJ :      
+            case CAN_RTR_0x102_MSG_OBJ :      
+            case CAN_RTR_0x103_MSG_OBJ :      
+            case CAN_RTR_0x104_MSG_OBJ :      
+            case CAN_RTR_0x105_MSG_OBJ :
+                // Automatic RTR response completed.
+                break;
+            default:
+                // other NOT configured msg obj
+                break;      
+        }
+    
+        // Clear the message object interrupt.
+        CAN_clearInterruptStatus(CANA_BASE, status);
+        
+    } else {
+        // If something unexpected caused the interrupt, this would handle it.
         // Spurious interrupt handling can go here.
     }
 
