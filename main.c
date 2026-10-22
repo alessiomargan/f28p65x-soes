@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "params.h"
 #include "sci_io_driverlib.h"
+#include "boot/boot_f28p65x.h"
 
 extern void EtherCAT_init(void);
 
@@ -90,12 +91,17 @@ static void Device_BaseInit(void) {
 //
 void main()
 {
+#if defined(F28_BOOTLOADER)
+    boot_capture_request();
+#endif
     // clocks, Flash, GPIO unlock, PIE/vector table
     Device_BaseInit();
     // Syscfg generate initialization
     Board_init();
-    // Configure EtherCAT after SysConfig so its pin mux and interrupts remain active
+#if !defined(F28_BOOTLOADER)
+    // Configure EtherCAT after SysConfig so its pin mux and interrupts remain active.
     EtherCAT_init();
+#endif
     // Redirect printf/DPRINT to SCIA
     sci_stdio_init();
     // 
@@ -106,6 +112,11 @@ void main()
         PRINTLN("FAIL Configure_flashAPI");
         FatalError_Handler(FATAL_ERROR_FLASH_API);
     }
+#if defined(F28_BOOTLOADER)
+    boot_try_start_application();
+    // Start EtherCAT only when the bootloader remains in recovery.
+    EtherCAT_init();
+#endif
     if (Read_Flash_Params() == PARAMS_CMD_ERROR) {
         //
         //glob_fault.bit.warn_read_flash = 1;
@@ -125,7 +136,13 @@ void main()
     print_sdo(&sdo.flash);
     
     // Init soes
+#if defined(F28_BOOTLOADER)
+    esc_cfg_t boot_config = config;
+    boot_config.post_state_change_hook = boot_post_state_change;
+    ecat_slv_init(&boot_config);
+#else
     ecat_slv_init(&config);
+#endif
 
     // start timer 
     CPUTimer_startTimer(myCPUTIMER2_BASE);

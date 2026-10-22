@@ -98,3 +98,18 @@ list-cores:
 list-ops:
 	@test -x "$(DSLITE)" || { echo "UniFlash CLI not found: $(DSLITE)"; exit 1; }
 	@"$(DSLITE)" --config="$(TARGET_CONFIG_FILE)" --list-ops
+
+# Host verification and packaging for the isolated FoE bootloader configurations.
+.PHONY: foe-test foe-check foe-package
+foe-test:
+	python3 tests/test_foe_update.py
+
+foe-check:
+	python3 tools/check_foe_stack.py
+
+# APP_BIN must be an explicitly verified flat binary linked at word 0x0A0000.
+FOE_BOARD ?= cc
+FOE_IMAGE ?= f28p65x.bin
+foe-package: foe-check
+	@test -n "$(APP_BIN)" || { echo "Set APP_BIN to the verified bank-1 flat binary"; exit 1; }
+	python3 tools/pack_foe_image.py --board "$(FOE_BOARD)" "$(APP_BIN)" "$(FOE_IMAGE)"
