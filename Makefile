@@ -1,8 +1,7 @@
 # Top-level helper Makefile for CCS-managed F28P65x builds and UniFlash.
 
 PROJECT_NAME ?= f28p65x-soes
-CONFIG ?= FLASH
-#CONFIG ?= LAUNCHXL_FLASH
+CONFIG ?= APP_CC
 
 HOST_OS ?= $(shell uname -s)
 ifeq ($(HOST_OS),Linux)
@@ -52,7 +51,7 @@ help:
 	@echo "  list-ops    List target-specific UniFlash operations"
 	@echo ""
 	@echo "Common overrides:"
-	@echo "  CONFIG=FLASH"
+	@echo "  CONFIG=APP_CC"
 	@echo "  CCS_INSTALL_DIR=/path/to/ccs-install"
 	@echo "  CCS_WORKSPACE=/path/to/headless-workspace"
 	@echo "  DSLITE=/path/to/dslite.sh"
@@ -99,11 +98,8 @@ list-ops:
 	@test -x "$(DSLITE)" || { echo "UniFlash CLI not found: $(DSLITE)"; exit 1; }
 	@"$(DSLITE)" --config="$(TARGET_CONFIG_FILE)" --list-ops
 
-# Host verification and packaging for the isolated FoE bootloader configurations.
-.PHONY: foe-test foe-check foe-package
-foe-test:
-	python3 tests/test_foe_update.py
-
+# Application image verification and FoE packaging for the dedicated bootloader.
+.PHONY: foe-check foe-package
 foe-check:
 	python3 tools/check_foe_stack.py
 

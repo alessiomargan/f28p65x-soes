@@ -14,6 +14,6 @@ for relative, digest in expected.items():
         bad.append(relative)
 if bad:
     sys.exit("Unreviewed SOES update path: " + ", ".join(bad) +
-             ". Apply the companion SOES commit and run tests/test_foe_update.py. "
+             ". Apply the companion SOES commit and run the bootloader project tests. "
              "Review changed dependency code before updating the manifest.")
 print("SOES FoE completion/error handling matches the tested revision.")

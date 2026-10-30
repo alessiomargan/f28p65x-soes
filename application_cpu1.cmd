@@ -1,3 +1,4 @@
+/* Bank-1 application layout used with the standalone FoE bootloader. */
 MEMORY
 {
    BEGIN            : origin = 0x0A0000, length = 0x000002  // Update the codestart location as needed
