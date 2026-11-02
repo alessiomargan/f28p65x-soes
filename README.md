@@ -1,1 +1,210 @@
-# F28P65X-soes
+# F28P65X-SOES
+
+EtherCAT application firmware for the Texas Instruments TMS320F28P65x CPU1
+and the F28P65x controlCARD. The application runs the SOES slave stack,
+application PDO/SDO handling, persistent parameters, and the board peripherals.
+
+This repository contains the bank-1 application. FoE firmware reception,
+validation, flash programming, and recovery are provided by the separate
+[`bl-f28p65x-ecat`](https://github.com/alessiomargan/bl-f28p65x-ecat)
+bootloader in flash bank 0.
+
+## Architecture
+
+The application is linked at C28 word address `0x0A0000`. It must be packaged
+before being sent through File-over-EtherCAT (FoE); a CCS `.out` file or the
+unpackaged flat binary is not a valid FoE update image.
+
+When the EtherCAT master requests `INIT → BOOT`, the application:
+
+1. Disables CPU interrupts.
+2. Writes `0xB007B007` and its inverse to shared NOINIT RAM.
+3. Branches directly to the bootloader codestart at `0x080000`.
+
+The direct branch deliberately avoids a full device reset. This preserves the
+integrated ESC configuration so the master can continue the existing session
+and transfer the update in Bootstrap. The bootloader consumes and clears the
+request before deciding whether to start the installed application or remain
+in recovery.
+
+The application and bootloader must use matching linker definitions for the
+four-word `.boot_request` section at `0x0003FC`.
+
+## Memory layout
+
+Addresses and sizes are expressed in 16-bit C28 words unless stated otherwise.
+
+| Region | Start | Size | Purpose |
+| --- | ---: | ---: | --- |
+| Bootloader | `0x080000` | `0x20000` words | Dedicated FoE recovery firmware |
+| Application slot | `0x0A0000` | `0x20000` words | Bank-1 update slot |
+| Application payload | `0x0A0000` | `0x1F800` words | Codestart, code, constants and load data |
+| Manifest sector | `0x0BF800` | `0x400` words | Packaged-image metadata |
+| Commit sector | `0x0BFC00` | `0x400` words | Bootloader commit marker |
+| Persistent parameters | `0x0C0000` | Bank 2 | Application parameter storage |
+| Boot request | `0x0003FC` | `4` words | Shared NOINIT handoff mailbox |
+
+The application linker file excludes the final two bank-1 sectors because they
+belong to the bootloader's manifest and commit protocol.
+
+## Repository layout
+
+| Path | Description |
+| --- | --- |
+| `main.c` | Device, application, parameter and SOES startup |
+| `application_boot_request.c` | Warm handoff to the dedicated bootloader |
+| `application_cpu1.cmd` | Bank-1 application linker layout |
+| `ecat_escss.c` | Integrated EtherCAT SubSystem initialization |
+| `external/SOES/` | SOES Git submodule |
+| `external/uc-test/` | Shared object dictionary, hooks and board application code |
+| `tools/check_foe_stack.py` | Verifies the reviewed SOES FoE implementation |
+| `tools/pack_foe_image.py` | Creates a validated bootloader update image |
+| `make_bin_APP_CC.cmd` | Exports the bank-1 payload as a flat binary |
+
+## Prerequisites
+
+- Code Composer Studio 21.0 or a compatible CCS installation.
+- The TI C2000 compiler and C2000Ware versions configured by the project.
+- Python 3 for the FoE source check and image packaging.
+- UniFlash/dslite when using the Makefile flash targets.
+- The companion bootloader programmed in flash bank 0 for FoE updates.
+
+The tracked host defaults are in `Makefile.linux_local` and
+`Makefile.darwin_local`. They can be overridden through the environment or on
+the `make` command line.
+
+## Clone
+
+Clone with both submodules:
+
+```sh
+git clone --recurse-submodules https://github.com/alessiomargan/F28P65X-soes.git
+cd F28P65X-soes
+```
+
+For an existing clone:
+
+```sh
+git submodule update --init --recursive
+```
+
+Do not update `external/SOES` or `tools/foe_stack.sha256.json` without
+reviewing the FoE completion/error paths and rerunning the bootloader tests.
+
+## Build
+
+`APP_CC` is the CCS configuration used for the controlCARD bank-1 application.
+Build it with CCS or with the helper Makefile:
+
+```sh
+make build CONFIG=APP_CC
+```
+
+For a clean full build:
+
+```sh
+make rebuild CONFIG=APP_CC
+```
+
+Useful overrides include:
+
+```sh
+make build CONFIG=APP_CC \
+  CCS_INSTALL_DIR=/path/to/ccs2100 \
+  CCS_WORKSPACE=/tmp/f28p65x-application-workspace
+```
+
+The relevant build outputs are:
+
+```text
+APP_CC/f28p65x-soes.out
+APP_CC/f28p65x-soes.bin
+APP_CC/f28p65x-soes_bin.map
+```
+
+The CCS pre-build step verifies the pinned SOES FoE sources and generates the
+build-information header. The post-build step uses `hex2000` and
+`make_bin_APP_CC.cmd` to export an even-sized, low-octet-first bank-1 binary.
+
+## Create the FoE update image
+
+Use the application Makefile so packaging always starts with a clean full
+rebuild:
+
+```sh
+make foe-package \
+  CONFIG=APP_CC \
+  APP_BIN=./APP_CC/f28p65x-soes.bin \
+  FOE_BOARD=cc \
+  FOE_IMAGE=f28p65x.bin
+```
+
+The command performs these operations in order:
+
+1. Cleans and fully rebuilds `APP_CC`.
+2. Verifies the reviewed SOES FoE implementation.
+3. Packages the rebuilt flat binary with its manifest and CRCs.
+
+Use `FOE_BOARD=lp` only for a binary built for the LaunchPad hardware. The
+generated package has these properties:
+
+| Property | Value |
+| --- | --- |
+| FoE filename | `f28p65x.bin` |
+| FoE password | `0xF280` |
+| Transfer size | `258080` octets |
+| Entry point | C28 word address `0x0A0000` |
+| Payload byte order | Low octet, then high octet for each C28 word |
+| Payload CRC | CRC-32/ISO-HDLC, compatible with `zlib.crc32()` |
+
+The packer rejects blank codestart data, odd-sized payloads, oversized
+payloads, and identical input/output paths. The bootloader independently
+validates the manifest, board target, entry point, payload CRC, erased padding,
+and commit marker before execution.
+
+## FoE update flow
+
+1. Start with the application in normal EtherCAT operation.
+2. The master requests Bootstrap; the application's state hook calls the
+   strong `jump_to_bootloader()` implementation.
+3. The application writes the retained request and branches to bank 0 without
+   resetting the integrated ESC.
+4. The bootloader remains reachable at the configured station address and
+   accepts `f28p65x.bin` with password `0xF280`.
+5. The bootloader invalidates the previous commit, programs and validates the
+   new image, then writes the commit marker last.
+6. After the final FoE acknowledgement, leaving BOOT for INIT resets the
+   device. The bootloader validates the committed image and starts this
+   application at `0x0A0000`.
+
+The first mailbox transition after an ESC/application restart can be rejected
+if the master requests PRE-OP before configuring SyncManagers 0 and 1. SOES
+correctly returns `INIT + ERROR`; after the master acknowledges the error,
+configures the mailboxes, and retries, the slave enters PRE-OP normally.
+
+## Direct programming
+
+For development, `make flash CONFIG=APP_CC` can program the CCS `.out` through
+UniFlash. Verify the UniFlash erase policy first: programming the application
+must not erase the bank-0 bootloader, the manifest/commit sectors, or unrelated
+persistent data. Production updates should use the packaged FoE image.
+
+## Verification and limitations
+
+Verify the checked-out SOES update path without building:
+
+```sh
+make foe-check
+```
+
+CRC detects accidental corruption but does not authenticate firmware. The FoE
+password is an access check, not a signature. The design does not provide A/B
+rollback, downgrade prevention, encrypted transport, or first-boot
+confirmation. Qualify flash interruption, ECC behavior, NOINIT retention,
+warm ESC preservation, and the bank-0/bank-1 jump on the target hardware before
+production use.
+
+## License
+
+Project code is provided under the MIT License; see [`LICENSE.md`](LICENSE.md).
+Third-party submodules retain their respective licenses.
