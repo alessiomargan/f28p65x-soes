@@ -106,6 +106,7 @@ foe-check:
 # APP_BIN must be an explicitly verified flat binary linked at word 0x0A0000.
 FOE_BOARD ?= cc
 FOE_IMAGE ?= f28p65x.bin
-foe-package: foe-check
+foe-package: rebuild
 	@test -n "$(APP_BIN)" || { echo "Set APP_BIN to the verified bank-1 flat binary"; exit 1; }
+	python3 tools/check_foe_stack.py
 	python3 tools/pack_foe_image.py --board "$(FOE_BOARD)" "$(APP_BIN)" "$(FOE_IMAGE)"
