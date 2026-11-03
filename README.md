@@ -126,24 +126,41 @@ The CCS pre-build step verifies the pinned SOES FoE sources and generates the
 build-information header. The post-build step uses `hex2000` and
 `make_bin_APP_CC.cmd` to export an even-sized, low-octet-first bank-1 binary.
 
+### Codestart source and SysConfig
+
+Every standalone C28x image must provide exactly one `code_start` symbol in a
+`codestart` section. This project imports the SysConfig **Device Support**
+module and leaves **Use Standard Code Start Branch** enabled (the default).
+SysConfig therefore adds C2000Ware's
+`device_support/f28p65x/common/source/f28p65x_codestartbranch.asm` to the CCS
+build automatically. Do not also keep a copy under `src/`, or the linker will
+report that `code_start` is redefined.
+
+For a project that does not use SysConfig, or one where **Use Standard Code
+Start Branch** is disabled, add one copy of `f28p65x_codestartbranch.asm` to
+the project sources. Never use both the SysConfig-provided source and a local
+copy. After changing this option, perform a clean rebuild so CCS regenerates
+its makefiles.
+
 ## Create the FoE update image
 
 Use the application Makefile so packaging always starts with a clean full
 rebuild:
 
 ```sh
-make foe-package \
-  CONFIG=APP_CC \
-  APP_BIN=./APP_CC/f28p65x-soes.bin \
-  FOE_BOARD=cc \
-  FOE_IMAGE=f28p65x.bin
+make foe-package
 ```
+
+By default, this rebuilds `APP_CC/f28p65x-soes.bin`, creates `f28p65x.bin`,
+and copies the package to `~/.ecat_master/firmware/f28p65x.bin`. Override
+`CONFIG`, `APP_BIN`, `FOE_BOARD`, `FOE_IMAGE`, or `FW_BIN_DIR` when needed.
 
 The command performs these operations in order:
 
 1. Cleans and fully rebuilds `APP_CC`.
 2. Verifies the reviewed SOES FoE implementation.
 3. Packages the rebuilt flat binary with its manifest and CRCs.
+4. Copies the completed package to `FW_BIN_DIR`.
 
 Use `FOE_BOARD=lp` only for a binary built for the LaunchPad hardware. The
 generated package has these properties:

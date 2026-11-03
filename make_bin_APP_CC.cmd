@@ -26,8 +26,6 @@ SECTIONS
     codestart:
     .text:
     .cinit:
-    .switch:
-    .init_array:
     .const:
     .TI.ramfunc:
 }

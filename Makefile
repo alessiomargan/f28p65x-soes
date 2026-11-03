@@ -47,6 +47,7 @@ help:
 	@echo "  flash       Build, program, and verify $(OUT_FILE)"
 	@echo "  flash-only Program and verify the existing .out without building"
 	@echo "  flash-run   Build, program, verify, and run CPU core $(CORE)"
+	@echo "  foe-package Rebuild, package, and install the FoE application image"
 	@echo "  list-cores  List target cores and their UniFlash indexes"
 	@echo "  list-ops    List target-specific UniFlash operations"
 	@echo ""
@@ -103,10 +104,15 @@ list-ops:
 foe-check:
 	python3 tools/check_foe_stack.py
 
-# APP_BIN must be an explicitly verified flat binary linked at word 0x0A0000.
+# APP_BIN must be a verified flat binary linked at word 0x0A0000.
+APP_BIN ?= $(CURDIR)/$(CONFIG)/$(PROJECT_NAME).bin
 FOE_BOARD ?= cc
 FOE_IMAGE ?= f28p65x.bin
+FW_BIN_DIR ?= $(HOME)/.ecat_master/firmware
 foe-package: rebuild
-	@test -n "$(APP_BIN)" || { echo "Set APP_BIN to the verified bank-1 flat binary"; exit 1; }
+	@test -f "$(APP_BIN)" || { echo "Application binary not found: $(APP_BIN)"; exit 1; }
 	python3 tools/check_foe_stack.py
 	python3 tools/pack_foe_image.py --board "$(FOE_BOARD)" "$(APP_BIN)" "$(FOE_IMAGE)"
+	@mkdir -p "$(FW_BIN_DIR)"
+	@cp "$(FOE_IMAGE)" "$(FW_BIN_DIR)/$(notdir $(FOE_IMAGE))"
+	@echo "Installed FoE image: $(FW_BIN_DIR)/$(notdir $(FOE_IMAGE))"
