@@ -5,44 +5,46 @@
 
 extern void FatalError_Handler(uint16_t errorCode);
 
-static inline uint16_t Config_ESCSS(void) {
+static inline uint16_t Config_ESCSS(bool preserve_esc) {
 
     uint16_t eepromTimeOut = 0x1000U;
     uint16_t memoryTimeOut = 0x300U;
 
-    // Sys PLL = 200MHz and use /2 to get 100MHz for ECAT IP
-    // (There is a built in /4 to get 25MHz for PHY when using
-    //  internal clocking for PHY)
-    SysCtl_setECatClk(SYSCTL_ECATCLKOUT_DIV_2, SYSCTL_SOURCE_SYSPLL,
-                      ESC_DISABLE_INT_PHY_CLK);
+    if (!preserve_esc) {
+        // Cold start owns the ESC clock configuration and Device_BaseInit()
+        // has configured SYSPLL. A warm application handoff skips this call
+        // entirely and retains the application's existing ESC clock.
+        SysCtl_setECatClk(SYSCTL_ECATCLKOUT_DIV_2, SYSCTL_SOURCE_SYSPLL,
+                          ESC_DISABLE_INT_PHY_CLK);
 
-    // Configure EEPROM Size for 16K bits or less
-    ESCSS_configureEEPROMSize(ESC_SS_CONFIG_BASE, ESCSS_LESS_THAN_16K);
+        // Configure EEPROM Size for 16K bits or less
+        ESCSS_configureEEPROMSize(ESC_SS_CONFIG_BASE, ESCSS_LESS_THAN_16K);
 
-    // Reset ESC
-    ESC_resetESC();
+        // Reset ESC
+        ESC_resetESC();
 
-    // Initialize ESCSS Memory
-    ESCSS_initMemory(ESC_SS_BASE);
+        // Initialize ESCSS Memory
+        ESCSS_initMemory(ESC_SS_BASE);
 
-    // Wait for ESCSS memory initialization to complete
-    if(ESCSS_getMemoryInitDoneStatusBlocking(ESC_SS_BASE, memoryTimeOut) !=
-       ESCSS_API_SUCCESS) {
-        return(ESC_HW_INIT_FAIL);
-    }
-
-    // Wait (with time out) for EEPROM to be loaded
-    while(ESC_loadedCheckEEPROM() != ESC_EEPROM_SUCCESS) {
-        eepromTimeOut--;
-        // On time out, return fail
-        if(eepromTimeOut == 0U) {
+        // Wait for ESCSS memory initialization to complete
+        if(ESCSS_getMemoryInitDoneStatusBlocking(ESC_SS_BASE, memoryTimeOut) !=
+           ESCSS_API_SUCCESS) {
             return(ESC_HW_INIT_FAIL);
         }
-    }
 
-    // Initialize AL Event Mask to zero to prevent ESC interrupts until
-    // set during stack state transition to SAFEOP
-    ESC_writeDWord(0UL, ESC_O_AL_EVENTMASK);
+        // Wait (with time out) for EEPROM to be loaded
+        while(ESC_loadedCheckEEPROM() != ESC_EEPROM_SUCCESS) {
+            eepromTimeOut--;
+            // On time out, return fail
+            if(eepromTimeOut == 0U) {
+                return(ESC_HW_INIT_FAIL);
+            }
+        }
+
+        // Initialize AL Event Mask to zero to prevent ESC interrupts until
+        // set during stack state transition to SAFEOP
+        ESC_writeDWord(0UL, ESC_O_AL_EVENTMASK);
+    }
 
     // Enable ECAT/PDI, Sync0, and Sync1 interrupts in ESCSS
     ESCSS_setMaskedInterruptStatus(ESC_SS_BASE,
@@ -378,10 +380,10 @@ static inline void Config_ESCSS_GPIOs(void) {
     #endif 
 }
 
-void EtherCAT_init(void) {
+void EtherCAT_init(bool preserve_esc) {
 
     Config_ESCSS_GPIOs();
-    if ( Config_ESCSS() != ESC_HW_INIT_SUCCESS) {
+    if ( Config_ESCSS(preserve_esc) != ESC_HW_INIT_SUCCESS) {
         PRINTLN("FAIL Configure_ESCSS");
         FatalError_Handler(FATAL_ERROR_ESCSS_HW_INIT);
     }

@@ -11,7 +11,7 @@
 #include "params.h"
 #include "sci_io_driverlib.h"
 
-extern void EtherCAT_init(void);
+extern void EtherCAT_init(bool);
 
 extern esc_cfg_t config;
 
@@ -95,7 +95,7 @@ void main()
     // Syscfg generate initialization
     Board_init();
     // Configure EtherCAT after SysConfig so its pin mux and interrupts remain active.
-    EtherCAT_init();
+    EtherCAT_init(false);
     // Redirect printf/DPRINT to SCIA
     sci_stdio_init();
     // 
